@@ -1,0 +1,589 @@
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 1
+
+
+
+
+
+       MCS-51 Family Macro Assembler   A S E M - 5 1   V 1.3
+       =====================================================
+
+
+
+	Source File:	C:\Users\Dell\Downloads\MicroProcessors\Project\last\last.asm
+	Object File:	C:\Users\Dell\Downloads\MicroProcessors\Project\last\last.hex
+	List File:	C:\Users\Dell\Downloads\MicroProcessors\Project\last\last.lst
+
+
+
+ Line  I  Addr  Code            Source
+
+    1:		B	 A0	RS BIT P2.0
+    2:		B	 A1	E BIT P2.1
+    3:		B	 A4	BUZZ BIT P2.4
+    4:		B	 A5	RLED BIT P2.5
+    5:		B	 A6	GLED BIT P2.6
+    6:		N      0000	ORG 0000H
+    7:
+    8:	  0000	7F 03		MOV R7,#3
+    9:
+   10:	  0002	C2 A2		CLR P2.2
+   11:	  0004	51 1D		ACALL W2
+   12:	  0006	B2 A2		CPL P2.2
+   13:
+   14:	  0008			AGAIN:
+   15:	  0008	75 B0 FF	   MOV P3,#0FFH
+   16:	  000B	C2 B0		   CLR P3.0
+   17:	  000D	C2 B1		   CLR P3.1
+   18:	  000F	C2 B2		   CLR P3.2
+   19:	  0011	C2 B3		   CLR P3.3
+   20:	  0013	C2 A4		   CLR BUZZ
+   21:	  0015	51 1D		   ACALL W2
+   22:	  0017	D2 A4		   SETB BUZZ
+   23:	  0019	D2 A6		   SETB GLED
+   24:	  001B	D2 A5		   SETB RLED
+   25:	  001D	78 2F		   MOV R0,#02FH		;Input Password is Stored at 030H in memory
+   26:	  001F	79 3F		   MOV R1,#03FH		;original Password is Stored at 040H in memory
+   27:	  0021	7C 04		   MOV R4,#4
+   28:	  0023	90 02 2B	   MOV DPTR,#PASS
+   29:
+   30:	  0026	E4		STORED_PASS: clr A
+   31:	  0027	93		   MOVC A,@A+DPTR
+   32:	  0028	09		   INC R1
+   33:	  0029	F7		   MOV @R1,A
+   34:	  002A	A3		   INC DPTR
+   35:	  002B	DC F9		   DJNZ R4,STORED_PASS
+   36:
+   37:
+   38:				; MAIN PROJECT
+   39:	  002D	74 38		MAIN:	MOV A,#38H
+   40:	  002F	31 E9			ACALL CMD
+   41:	  0031	74 0E			MOV A,#0EH
+   42:	  0033	31 E9			ACALL CMD
+
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 2
+
+
+
+ Line  I  Addr  Code            Source
+
+
+
+   43:	  0035	74 01			MOV A,#01H
+   44:	  0037	31 E9			ACALL CMD
+   45:	  0039	74 80			MOV A,#080H
+   46:	  003B	31 E9			ACALL CMD
+   47:	  003D	51 0B			ACALL DEL
+   48:	  003F	11 43			ACALL PRT
+   49:	  0041	11 58			ACALL KEY_READ
+   50:				;END MAIN
+   51:
+   52:	  0043	7C 0B		PRT:	MOV R4,#11
+   53:	  0045	90 02 2F		MOV DPTR,#STRING1
+   54:
+   55:	  0048	E4		S1: 	CLR A
+   56:	  0049	93			MOVC A,@A+DPTR
+   57:	  004A	31 F4			ACALL DAT
+   58:	  004C	A3			INC DPTR
+   59:	  004D	DC F9			DJNZ R4,S1
+   60:	  004F	74 C0			MOV A,#0C0H
+   61:	  0051	31 E9		   	ACALL CMD
+   62:	  0053	7C 04			MOV R4,#4
+   63:	  0055	80 01			SJMP KEY_READ
+   64:	  0057	22			RET
+   65:
+   66:	  0058			KEY_READ:
+   67:	  0058	51 0B			 ACALL DEL
+   68:	  005A	30 B4 12		 JNB P3.4,C1
+   69:	  005D	30 B5 25	 	 JNB P3.5,C2
+   70:	  0060	30 B6 64		 JNB P3.6,C3
+   71:	  0063	30 B7 06		 JNB P3.7,C4S
+   72:	  0066	BC 00 EF		 CJNE R4,#0,KEY_READ
+   73:	  0069	02 01 79		 JMP BEFORE_CHECK
+   74:	  006C	02 01 06		 C4S:JMP C4
+   75:
+   76:	  006F			KEY_SCAN:
+   77:
+   78:	  006F	1C		C1:	DEC R4
+   79:	  0070	08			INC R0
+   80:	  0071	D2 B0			SETB P3.0
+   81:	  0073	20 B4 25		JB P3.4,SEVEN
+   82:	  0076	D2 B1			SETB P3.1
+   83:	  0078	20 B4 2B		JB P3.4,FOUR
+   84:	  007B	D2 B2			SETB P3.2
+   85:	  007D	20 B4 31		JB P3.4,ONE
+   86:	  0080	D2 B3			SETB P3.3
+   87:	  0082	20 B4 37		JB P3.4,STAR
+   88:
+   89:	  0085	1C		C2:	DEC R4
+   90:	  0086	08			INC R0
+   91:	  0087	D2 B0			SETB P3.0
+   92:	  0089	20 B5 51		JB P3.5,EIGHT
+   93:	  008C	D2 B1			SETB P3.1
+   94:	  008E	20 B5 57		JB P3.5,FIVE
+   95:	  0091	D2 B2			SETB P3.2
+   96:	  0093	20 B5 5C		JB P3.5,TWO
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 3
+
+
+
+ Line  I  Addr  Code            Source
+
+   97:	  0096	D2 B3			SETB P3.3
+   98:	  0098	20 B5 61		JB P3.5,ZERO
+   99:
+  100:	  009B	74 37		SEVEN:	MOV A,#'7'
+  101:	  009D	31 FF			ACALL DAT1
+  102:	  009F	51 0B			ACALL DEL
+  103:	  00A1	76 37			MOV @R0,#'7'
+  104:	  00A3	02 01 6C		JMP KEYPAD
+  105:
+  106:	  00A6	74 34		FOUR:	MOV A,#'4'
+  107:	  00A8	31 FF			ACALL DAT1
+  108:	  00AA	51 0B			ACALL DEL
+  109:	  00AC	76 34			MOV @R0,#'4'
+  110:	  00AE	02 01 6C		JMP KEYPAD
+  111:
+  112:	  00B1	74 31		ONE:	MOV A,#'1'
+  113:	  00B3	31 FF			ACALL DAT1
+  114:	  00B5	51 0B			ACALL DEL
+  115:	  00B7	76 31			MOV @R0,#'1'
+  116:	  00B9	02 01 6C		JMP KEYPAD
+  117:
+  118:	  00BC	74 2A		STAR:	MOV A,#'*'
+  119:	  00BE	31 FF			ACALL DAT1
+  120:	  00C0	51 0B			ACALL DEL
+  121:	  00C2	76 2A			MOV @R0,#'*'
+  122:	  00C4	02 01 6C		JMP KEYPAD
+  123:
+  124:	  00C7	1C		C3: 	DEC R4
+  125:	  00C8	08			INC R0
+  126:	  00C9	D2 B0			SETB P3.0
+  127:	  00CB	20 B6 4E		JB P3.6,NINE
+  128:	  00CE	D2 B1			SETB P3.1
+  129:	  00D0	20 B6 53		JB P3.6,SIX
+  130:	  00D3	D2 B2			SETB P3.2
+  131:	  00D5	20 B6 58		JB P3.6,THREE
+  132:	  00D8	D2 B3			SETB P3.3
+  133:	  00DA	20 B6 5D		JB P3.6,HASH
+  134:
+  135:	  00DD	74 38		EIGHT:	MOV A,#'8'
+  136:	  00DF	31 FF			ACALL DAT1
+  137:	  00E1	51 0B			ACALL DEL
+  138:	  00E3	76 38			MOV @R0,#'8'
+  139:	  00E5	02 01 6C		JMP KEYPAD
+  140:
+  141:	  00E8	74 35		FIVE:	MOV A,#'5'
+  142:	  00EA	31 FF			ACALL DAT1
+  143:	  00EC	51 0B			ACALL DEL
+  144:	  00EE	76 35			MOV @R0,#'5'
+  145:	  00F0	80 7A			SJMP KEYPAD
+  146:
+  147:	  00F2	74 32		TWO:	MOV A,#'2'
+  148:	  00F4	31 FF			ACALL DAT1
+  149:	  00F6	51 0B			ACALL DEL
+  150:	  00F8	76 32			MOV @R0,#'2'
+  151:	  00FA	80 70			SJMP KEYPAD
+  152:
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 4
+
+
+
+ Line  I  Addr  Code            Source
+
+  153:	  00FC	74 30		ZERO:	MOV A,#'0'
+  154:	  00FE	31 FF			ACALL DAT1
+  155:	  0100	51 0B			ACALL DEL
+  156:	  0102	76 30			MOV @R0,#'0'
+  157:	  0104	80 66			SJMP KEYPAD
+  158:
+  159:	  0106	1C		C4: 	DEC R4
+  160:	  0107	08			INC R0
+  161:	  0108	D2 B0			SETB P3.0
+  162:	  010A	20 B7 37		JB P3.7,AA
+  163:	  010D	D2 B1			SETB P3.1
+  164:	  010F	20 B7 3C		JB P3.7,BB
+  165:	  0112	D2 B2			SETB P3.2
+  166:	  0114	20 B7 41		JB P3.7,CC
+  167:	  0117	D2 B3			SETB P3.3
+  168:	  0119	20 B7 46		JB P3.7,DD
+  169:
+  170:	  011C	74 39		NINE:	MOV A,#'9'
+  171:	  011E	31 FF			ACALL DAT1
+  172:	  0120	51 0B			ACALL DEL
+  173:	  0122	76 39			MOV @R0,#'9'
+  174:	  0124	80 46			SJMP KEYPAD
+  175:
+  176:	  0126	74 36		SIX:	MOV A,#'6'
+  177:	  0128	31 FF			ACALL DAT1
+  178:	  012A	51 0B			ACALL DEL
+  179:	  012C	76 36			MOV @R0,#'6'
+  180:	  012E	80 3C			SJMP KEYPAD
+  181:
+  182:	  0130	74 33		THREE:	MOV A,#'3'
+  183:	  0132	31 FF			ACALL DAT1
+  184:	  0134	51 0B			ACALL DEL
+  185:	  0136	76 33			MOV @R0,#'3'
+  186:	  0138	80 32			SJMP KEYPAD
+  187:
+  188:	  013A	74 23		HASH:	MOV A,#'#'
+  189:	  013C	31 FF			ACALL DAT1
+  190:	  013E	51 0B			ACALL DEL
+  191:	  0140	76 23			MOV @R0,#'#'
+  192:	  0142	80 28			SJMP KEYPAD
+  193:
+  194:	  0144	74 41		AA:	MOV A,#'A'
+  195:	  0146	31 FF			ACALL DAT1
+  196:	  0148	51 0B			ACALL DEL
+  197:	  014A	76 48		      	MOV @R0,#'H'
+  198:	  014C	80 1E			SJMP KEYPAD
+  199:
+  200:	  014E	74 42		BB:	MOV A,#'B'
+  201:	  0150	31 FF			ACALL DAT1
+  202:	  0152	51 0B			ACALL DEL
+  203:	  0154	76 48			MOV @R0,#'H'
+  204:	  0156	80 14			SJMP KEYPAD
+  205:
+  206:	  0158	74 43		CC:	MOV A,#'C'
+  207:	  015A	31 FF			ACALL DAT1
+  208:	  015C	51 0B			ACALL DEL
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 5
+
+
+
+ Line  I  Addr  Code            Source
+
+  209:	  015E	76 48			MOV @R0,#'H'
+  210:	  0160	80 0A			SJMP KEYPAD
+  211:
+  212:	  0162	74 44		DD:	MOV A,#'D'
+  213:	  0164	31 FF			ACALL DAT1
+  214:	  0166	51 0B			ACALL DEL
+  215:	  0168	76 48			MOV @R0,#'H'
+  216:	  016A	80 00			SJMP KEYPAD
+  217:
+  218:	  016C	C2 B0		KEYPAD:	CLR P3.0
+  219:	  016E	C2 B1			CLR P3.1
+  220:	  0170	C2 B2			CLR P3.2
+  221:	  0172	C2 B3			CLR P3.3
+  222:	  0174	51 0B			ACALL DEL
+  223:	  0176	01 58			JMP KEY_READ
+  224:	  0178	22			RET
+  225:
+  226:	  0179			BEFORE_CHECK:
+  227:	  0179	74 01			MOV A,#01H
+  228:	  017B	31 E9		        ACALL CMD
+  229:	  017D	74 80		    	MOV A,#080H
+  230:	  017F	31 E9		    	ACALL CMD
+  231:	  0181	51 0B			ACALL DEL
+  232:	  0183	78 2F			MOV R0,#02FH
+  233:	  0185	79 3F			MOV R1,#03FH
+  234:	  0187	7C 04			MOV R4,#4
+  235:
+  236:	  0189	08		CHECK:	INC R0
+  237:	  018A	09			INC R1
+  238:	  018B	E6			MOV A,@R0
+  239:	  018C	87 F0			MOV B,@R1
+  240:	  018E	B5 F0 20		CJNE A,B,FA
+  241:	  0191	DC F6			DJNZ R4,CHECK
+  242:	  0193	7C 07		    	MOV R4,#7
+  243:	  0195	90 02 3A		MOV DPTR,#STRING2
+  244:
+  245:	  0198	E4		SUCCESS:CLR A
+  246:	  0199	93			MOVC A,@A+DPTR
+  247:	  019A	31 F4			ACALL DAT
+  248:	  019C	A3			INC DPTR
+  249:	  019D	DC F9			DJNZ R4,SUCCESS
+  250:	  019F	C2 A3			CLR P2.3
+  251:	  01A1	B2 A6			CPL GLED
+  252:	  01A3	51 1D			ACALL W2
+  253:	  01A5	B2 A3		 	CPL P2.3
+  254:	  01A7	51 26			ACALL WAIT3
+  255:	  01A9	C2 A2			CLR P2.2
+  256:	  01AB	51 1D			ACALL W2
+  257:	  01AD	B2 A2			CPL P2.2
+  258:	  01AF	01 08			JMP AGAIN
+  259:
+  260:	  01B1	7C 07		FA:	MOV R4,#7
+  261:	  01B3	90 02 41		MOV DPTR,#STRING3
+  262:	  01B6	B2 A5			CPL RLED
+  263:
+  264:	  01B8	E4		FAIL:   CLR A
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 6
+
+
+
+ Line  I  Addr  Code            Source
+
+  265:	  01B9	93			MOVC A,@A+DPTR
+  266:	  01BA	31 F4			ACALL DAT
+  267:	  01BC	A3			INC DPTR
+  268:	  01BD	DC F9			DJNZ R4,FAIL
+  269:	  01BF	7C 0A			MOV R4,#10
+  270:
+  271:	  01C1	51 0B		WAIT:   ACALL DEL
+  272:	  01C3	DC FC			DJNZ R4,WAIT
+  273:	  01C5	DF 1F			DJNZ R7,X
+  274:	  01C7	74 01			MOV A,#01H
+  275:	  01C9	31 E9		        ACALL CMD
+  276:	  01CB	74 80		    	MOV A,#080H
+  277:	  01CD	31 E9		    	ACALL CMD
+  278:	  01CF	51 0B		    	ACALL DEL
+  279:
+  280:	  01D1	7C 05		ALERT:  MOV R4,#5
+  281:	  01D3	90 02 48	        MOV DPTR,#STRING4
+  282:
+  283:	  01D6	E4		AL: 	CLR A
+  284:	  01D7	93			MOVC A,@A+DPTR
+  285:	  01D8	31 F4			ACALL DAT
+  286:	  01DA	A3			INC DPTR
+  287:	  01DB	DC F9			DJNZ R4,AL
+  288:	  01DD	C2 A4			CLR BUZZ
+  289:	  01DF	51 24			ACALL W3
+  290:	  01E1	D2 A4			SETB BUZZ
+  291:	  01E3	01 08			JMP AGAIN
+  292:	  01E5	22			RET
+  293:
+  294:	  01E6	01 08		X: 	JMP AGAIN
+  295:	  01E8	22			RET
+  296:
+  297:	  01E9	F5 90		CMD:	MOV P1,A
+  298:	  01EB	C2 A0			CLR RS
+  299:	  01ED	D2 A1			SETB E
+  300:	  01EF	51 14			ACALL DEL2
+  301:	  01F1	C2 A1			CLR E
+  302:	  01F3	22			RET
+  303:
+  304:				;FOR DISPLAY
+  305:	  01F4	F5 90		DAT: 	MOV P1,A
+  306:	  01F6	D2 A0			SETB RS
+  307:	  01F8	D2 A1			SETB E
+  308:	  01FA	51 14			ACALL DEL2
+  309:	  01FC	C2 A1			CLR E
+  310:	  01FE	22			RET
+  311:
+  312:				;FOR ENCRYPTION
+  313:	  01FF	75 90 2A	DAT1:	MOV P1,#'*'
+  314:	  0202	D2 A0			SETB RS
+  315:	  0204	D2 A1			SETB E
+  316:	  0206	51 14		  	ACALL DEL2
+  317:	  0208	C2 A1		  	CLR E
+  318:	  020A	22		  	RET
+  319:
+  320:				;DELAY
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 7
+
+
+
+ Line  I  Addr  Code            Source
+
+  321:	  020B	79 FA		DEL: MOV R1,#250
+  322:	  020D	7A FA		D2 : MOV R2,#250
+  323:	  020F	DA FE		D3 : DJNZ R2,D3
+  324:	  0211	D9 FA		     DJNZ R1,D2
+  325:	  0213	22		     RET
+  326:
+  327:	  0214	79 0A		DEL2: MOV R1,#10
+  328:	  0216	7A 14		D22 : MOV R2,#20
+  329:	  0218	DA FE		D33 : DJNZ R2,D33
+  330:	  021A	D9 FA		      DJNZ R1,D22
+  331:	  021C	22		      RET
+  332:
+  333:	  021D	7C 07		W2:     MOV R4,#7
+  334:	  021F	51 0B		WAIT2:	ACALL DEL
+  335:	  0221	DC FC			DJNZ R4,WAIT2
+  336:	  0223	22			RET
+  337:
+  338:	  0224	7C 64		W3:     MOV R4,#100
+  339:	  0226	51 0B		WAIT3:	ACALL DEL
+  340:	  0228	DC FC			DJNZ R4,WAIT3
+  341:	  022A	22			RET
+  342:
+  343:	  022B	31 32 33 34	PASS: 	 DB "1234"
+  344:	  022F	45 4E 54 45	STRING1: DB "ENTER PIN: "
+	  0233	52 20 50 49
+	  0237	4E 3A 20
+  345:	  023A	53 55 43 43	STRING2: DB "SUCCESS"
+	  023E	45 53 53
+  346:	  0241	46 41 49 4C	STRING3: DB "FAILURE"
+	  0245	55 52 45
+  347:	  0248	41 4C 45 52	STRING4: DB "ALERT"
+	  024C	54
+  348:
+  349:				END
+
+
+
+
+
+                     register banks used:  ---
+
+                     no errors
+
+
+
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 8
+
+
+
+
+
+	       L I S T   O F   S Y M B O L S
+	       =============================
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+??ASEM_51			  NUMBER    8051
+??VERSION			  NUMBER    0130
+AA				  CODE	    0144	 194
+AC				  BIT	      D6
+ACC				  DATA	      E0
+AGAIN				  CODE	    0008	  14
+AL				  CODE	    01D6	 283
+ALERT				  CODE	    01D1	 280
+B				  DATA	      F0
+BB				  CODE	    014E	 200
+BEFORE_CHECK			  CODE	    0179	 226
+BUZZ				  BIT	      A4	   3
+C1				  CODE	    006F	  78
+C2				  CODE	    0085	  89
+C3				  CODE	    00C7	 124
+C4				  CODE	    0106	 159
+C4S				  CODE	    006C	  74
+CC				  CODE	    0158	 206
+CHECK				  CODE	    0189	 236
+CMD				  CODE	    01E9	 297
+CY				  BIT	      D7
+D2				  CODE	    020D	 322
+D22				  CODE	    0216	 328
+D3				  CODE	    020F	 323
+D33				  CODE	    0218	 329
+DAT				  CODE	    01F4	 305
+DAT1				  CODE	    01FF	 313
+DD				  CODE	    0162	 212
+DEL				  CODE	    020B	 321
+DEL2				  CODE	    0214	 327
+DPH				  DATA	      83
+DPL				  DATA	      82
+E				  BIT	      A1	   2
+EA				  BIT	      AF
+EIGHT				  CODE	    00DD	 135
+ES				  BIT	      AC
+ET0				  BIT	      A9
+ET1				  BIT	      AB
+EX0				  BIT	      A8
+EX1				  BIT	      AA
+EXTI0				  CODE	    0003
+EXTI1				  CODE	    0013
+F0				  BIT	      D5
+FA				  CODE	    01B1	 260
+FAIL				  CODE	    01B8	 264
+FIVE				  CODE	    00E8	 141
+FOUR				  CODE	    00A6	 106
+GLED				  BIT	      A6	   5
+HASH				  CODE	    013A	 188
+IE				  DATA	      A8
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 9
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+IE0				  BIT	      89
+IE1				  BIT	      8B
+INT0				  BIT	      B2
+INT1				  BIT	      B3
+IP				  DATA	      B8
+IT0				  BIT	      88
+IT1				  BIT	      8A
+KEYPAD				  CODE	    016C	 218
+KEY_READ			  CODE	    0058	  66
+KEY_SCAN			  CODE	    006F	  76
+MAIN				  CODE	    002D	  39
+NINE				  CODE	    011C	 170
+ONE				  CODE	    00B1	 112
+OV				  BIT	      D2
+P				  BIT	      D0
+P0				  DATA	      80
+P1				  DATA	      90
+P2				  DATA	      A0
+P3				  DATA	      B0
+PASS				  CODE	    022B	 343
+PCON				  DATA	      87
+PRT				  CODE	    0043	  52
+PS				  BIT	      BC
+PSW				  DATA	      D0
+PT0				  BIT	      B9
+PT1				  BIT	      BB
+PX0				  BIT	      B8
+PX1				  BIT	      BA
+RB8				  BIT	      9A
+RD				  BIT	      B7
+REN				  BIT	      9C
+RESET				  CODE	    0000
+RI				  BIT	      98
+RLED				  BIT	      A5	   4
+RS				  BIT	      A0	   1
+RS0				  BIT	      D3
+RS1				  BIT	      D4
+RXD				  BIT	      B0
+S1				  CODE	    0048	  55
+SBUF				  DATA	      99
+SCON				  DATA	      98
+SEVEN				  CODE	    009B	 100
+SINT				  CODE	    0023
+SIX				  CODE	    0126	 176
+SM0				  BIT	      9F
+SM1				  BIT	      9E
+SM2				  BIT	      9D
+SP				  DATA	      81
+STAR				  CODE	    00BC	 118
+STORED_PASS			  CODE	    0026	  30
+STRING1				  CODE	    022F	 344
+STRING2				  CODE	    023A	 345
+STRING3				  CODE	    0241	 346
+STRING4				  CODE	    0248	 347
+SUCCESS				  CODE	    0198	 245
+T0				  BIT	      B4
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 10
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+T1				  BIT	      B5
+TB8				  BIT	      9B
+TCON				  DATA	      88
+TF0				  BIT	      8D
+TF1				  BIT	      8F
+TH0				  DATA	      8C
+TH1				  DATA	      8D
+THREE				  CODE	    0130	 182
+TI				  BIT	      99
+TIMER0				  CODE	    000B
+TIMER1				  CODE	    001B
+TL0				  DATA	      8A
+TL1				  DATA	      8B
+TMOD				  DATA	      89
+TR0				  BIT	      8C
+TR1				  BIT	      8E
+TWO				  CODE	    00F2	 147
+TXD				  BIT	      B1
+W2				  CODE	    021D	 333
+W3				  CODE	    0224	 338
+WAIT				  CODE	    01C1	 271
+WAIT2				  CODE	    021F	 334
+WAIT3				  CODE	    0226	 339
+WR				  BIT	      B6
+X				  CODE	    01E6	 294
+ZERO				  CODE	    00FC	 153

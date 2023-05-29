@@ -1,0 +1,13 @@
+video link
+https://youtu.be/Zhsktt0S1Fo
+
+1. upload the ISE from examples on Arduino and set the right port comm
+
+chip erase code- 
+
+"C:\Program Files (x86)\Arduino\hardware\tools\avr\bin\avrdude.exe" -C C:/AVR8051.conf -c stk500v1 -P COM7 -p 89s52 -b 19200 -e
+
+Door lock system
+
+"C:\Program Files (x86)\Arduino\hardware\tools\avr\bin\avrdude.exe" -C C:/AVR8051.conf -c stk500v1 -P COM7 -p 89s52 -b 19200 -U flash:w:"C:\Users\Dell\Downloads\MicroProcessors\Project\last\last.hex":a
+
